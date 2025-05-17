@@ -1,68 +1,73 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.Profiling.Memory.Experimental;
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject cube1;
-    public GameObject cube2;
+    //싱글톤
+    //이게임을 진행하면서 단하나만 필요할때
+    //어디서든지 편하게 접근하게함
+    public static GameManager Instance;
 
-    Coroutine coroutine1;
-    // Start is called before the first frame update
-    void Start()
+    [Header("플레이어")]
+    [SerializeField] private GameObject PlyerPref;
+
+    [Header("몬스터")]
+    [SerializeField] private GameObject EnemyPref;//플레이어 오브젝트 
+    [SerializeField] private int MonsterSPcount = 10;
+
+    [SerializeField] private float spawnAreaWidth = 40;
+    [SerializeField] private float spawnAreaHeight = 40;
+    [SerializeField] private float spawnAreaMargin = 2; //스폰시 여유공간
+    [SerializeField] private GameObject player;
+    [SerializeField] private List<GameObject> Enemyies = new List<GameObject>();
+    private float spawnAreaHarfWidth;
+    private float spawnAreaHarfHeight;
+
+    public float SpawnAreaHarfWidth => spawnAreaHarfWidth;
+    public float SpawnAreaHarfHeight => spawnAreaHarfHeight;//프라이빗 접근 하는방법 프로퍼티
+    private void Awake()
     {
-        Debug.Log("스타트함수시작");
-        //StartCoroutine(nameof(Cubefalse), 2); //매개변수 넘기기 단 1개이상은안됨
-        coroutine1 = StartCoroutine(Cubefalse(2, 3));//여러개 매개변수 넘기기 스톱코루틴의 내임오브로 정지가안됨
-        StartCoroutine(nameof(CubeTure));
-        Debug.Log("스타트함수종료");
-    }
-
-    // Update is called once per frame
-    IEnumerator Cubefalse(float delay1, float delay2)//코루틴
-    {
-        Debug.Log("코루틴시작");
-        yield return new WaitForSeconds(delay1);
-
-        cube1.SetActive(false);
-
-        yield return new WaitForSeconds(delay2);
-
-        cube2.SetActive(false);
-
-
-        //yield return null;//1프레임 아주잠깐 
-
-        Debug.Log("코루틴 종료");
+        Instance = this; //싱글톤 사용할때 해줘야하는것
+        spawnAreaHarfWidth = (spawnAreaWidth / spawnAreaMargin) - 1;
+        spawnAreaHarfHeight = (spawnAreaHeight / spawnAreaMargin) - 1;
 
     }
-    IEnumerator CubeTure()//코루틴
+    private void Start()
     {
-        Debug.Log("코루틴시작");
-        yield return new WaitForSeconds(2);
-
-        cube1.SetActive(true);
-
-        yield return new WaitForSeconds(3);//3초
-
-        cube2.SetActive(true);
 
 
-        //yield return null;//1프레임 아주잠깐 
+        
+        SpawnPlyer();
+        SpawnMonster();
 
-        Debug.Log("코루틴 종료");
 
     }
-
-    public void Stop()
+    void SpawnPlyer()
     {
-        StopCoroutine(coroutine1);
-
-        StopAllCoroutines();
-        Debug.Log("코루틴  멈춰");
+        player = Instantiate(PlyerPref);
     }
+    void SpawnMonster()
+    {
+        
+
+        for (int i = 0; i < MonsterSPcount; i++)
+        {
+            float spwanPosX = Random.Range(-spawnAreaHarfWidth, spawnAreaHarfWidth);
+            float spwanPosZ = Random.Range(-spawnAreaHarfHeight, spawnAreaHarfHeight);
+
+            float spawnRoty = Random.Range(0, 360);
+
+            Vector3 spawnPos = new Vector3(spwanPosX, EnemyPref.transform.position.y, spwanPosZ);
+            Quaternion spawnRot = Quaternion.Euler(0, spawnRoty, 0);
+            GameObject enemy = Instantiate(EnemyPref, spawnPos, spawnRot);
+            Enemyies.Add(enemy);
 
 
+        }
+    }
 }
  
