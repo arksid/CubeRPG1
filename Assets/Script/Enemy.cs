@@ -18,9 +18,10 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         
-        StartCoroutine(MoveEnemy());
+        
         spwanAreaHarfWidth = GameManager.Instance.SpawnAreaHarfWidth;
         spwanAreaHarfHeight = GameManager.Instance.SpawnAreaHarfHeight;
+        StartCoroutine(nameof(MoveEnemy));
     }
 
     void Update()
